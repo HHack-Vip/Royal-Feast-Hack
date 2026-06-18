@@ -2,16 +2,38 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لعبة الطعام والسم</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة الحظ الاحترافية</title>
+    <style>
+        body { background: #2b0000; display: flex; flex-direction: column; align-items: center; color: white; font-family: sans-serif; margin: 0; padding: 20px; }
+        #game-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 500px; }
+        .cell { aspect-ratio: 1/1; background: linear-gradient(145deg, #ffd700, #b8860b); border-radius: 10px; border: 3px solid #5d4037; display: flex; justify-content: center; align-items: center; font-size: 3rem; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .cell.revealed { background: #3e2723; }
+        button { padding: 15px 30px; font-size: 1.2rem; margin-top: 20px; background: #c62828; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        h1 { margin-bottom: 10px; }
+    </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>لعبة الحظ</h1>
-        <div id="multiplier-display">المضاعف: 1.00</div>
-        <div id="game-board"></div>
-        <button onclick="resetGame()">إعادة بدء دور جديد</button>
-    </div>
-    <script src="script.js"></script>
+    <h1>لعبة الملك</h1>
+    <div id="multiplier-display">المضاعف: 1.00</div>
+    <div id="game-board"></div>
+    <button onclick="location.reload()">بداية جديدة</button>
+
+    <script>
+        const layout = [1,0,0,1,0, 1,0,1,0,1, 1,0,1,1,1, 1,1,1,0,0, 1,1,0,0,1];
+        const foods = ["🥩", "🍗", "🍕", "🫓", "🍰"];
+        const board = document.getElementById('game-board');
+        
+        layout.forEach(type => {
+            const div = document.createElement('div');
+            div.className = 'cell';
+            div.onclick = () => {
+                if(div.classList.contains('revealed')) return;
+                div.classList.add('revealed');
+                div.innerHTML = type === 1 ? foods[Math.floor(Math.random()*foods.length)] : "☠️";
+            };
+            board.appendChild(div);
+        });
+    </script>
 </body>
 </html>
