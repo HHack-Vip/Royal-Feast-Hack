@@ -3,42 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الحظ</title>
+    <title>لعبة الحظ المخصصة</title>
     <style>
-        body { background: #2b0000; display: flex; flex-direction: column; align-items: center; color: white; font-family: sans-serif; margin: 0; padding: 15px; }
+        body { background: #2b0000; display: flex; flex-direction: column; align-items: center; color: white; font-family: sans-serif; padding: 15px; }
         #game-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 400px; }
-        .cell { aspect-ratio: 1/1; background: #5d4037; border-radius: 8px; border: 2px solid #b8860b; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; cursor: pointer; }
+        .cell { aspect-ratio: 1/1; background: #b8860b; border-radius: 8px; border: 2px solid #5d4037; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; cursor: pointer; }
         .cell.revealed { background: #3e2723; }
         button { padding: 15px 40px; font-size: 1.5rem; margin-top: 25px; background: #c62828; color: white; border: none; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>لعبة الحظ</h1>
-    <div id="multiplier-display" style="margin-bottom:15px; font-size: 1.2rem;">المضاعف: 1.00</div>
     <div id="game-board"></div>
     <button onclick="location.reload()">بداية جديدة</button>
 
     <script>
-        // التوزيع من الأسفل (الصف 1) إلى الأعلى (الصف 5)
-        // 1 = طعام، 0 = سم
+        // الترتيب حسب طلبك (1 للطعام، 0 للسم)
         const layout = [
-            1, 0, 0, 1, 0, // الصف السفلي: لحم سم سم لحم سم
-            1, 0, 1, 0, 1, // الصف 2: تورتا سم بيتزا سم حواوشي
-            1, 0, 1, 0, 1, // الصف 3: تورتا سم فراخ سم حواوشي
-            1, 1, 1, 0, 0, // الصف 4: تورتا حواوشي بيتزا سم سم
-            1, 1, 0, 0, 1  // الصف 5: فراخ لحمه سم سم تورتا
+            1, 1, 0, 0, 1, // 1-5
+            1, 1, 1, 0, 0, // 6-10
+            1, 0, 1, 0, 1, // 11-15
+            1, 0, 1, 0, 1, // 16-20
+            1, 0, 0, 1, 0  // 21-25
         ];
 
-        const foodIcons = ["🥩", "🍗", "🍕", "🫓", "🍰"];
+        const foods = ["🥩", "🍗", "🍕", "🫓", "🍰"];
         const board = document.getElementById('game-board');
         
-        layout.forEach(type => {
+        layout.forEach((type) => {
             const div = document.createElement('div');
             div.className = 'cell';
             div.onclick = () => {
                 if(div.classList.contains('revealed')) return;
                 div.classList.add('revealed');
-                div.innerHTML = type === 1 ? foodIcons[Math.floor(Math.random()*foodIcons.length)] : "☠️";
+                div.innerHTML = type === 1 ? foods[Math.floor(Math.random()*foods.length)] : "☠️";
             };
             board.appendChild(div);
         });
