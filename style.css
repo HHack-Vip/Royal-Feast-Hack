@@ -1,21 +1,19 @@
 #game-board {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    max-width: 400px;
-    margin: 20px auto;
+    grid-template-columns: repeat(5, 1fr); /* 5 أعمدة */
+    gap: 15px; /* مسافة بين المربعات */
+    max-width: 90%; /* حجم أكبر */
+    margin: 30px auto;
 }
 
 .cell {
-    width: 60px;
-    height: 60px;
-    background-color: #d4af37; /* لون ذهبي للغطاء */
-    border-radius: 8px;
+    aspect-ratio: 1 / 1; /* يجعل المربع مربعاً تماماً */
+    background-color: #d4af37;
+    border-radius: 15px;
     cursor: pointer;
-    border: 2px solid #8b4513;
-}
-
-#game-container {
-    text-align: center;
-    font-family: Arial, sans-serif;
+    border: 4px solid #8b4513;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px; /* حجم الأيقونة */
 }
