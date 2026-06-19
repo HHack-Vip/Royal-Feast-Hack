@@ -2,52 +2,75 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الملك</title>
+    <title>بوابة الدخول الملكية</title>
     <style>
-        body { background: #3e0000; display: flex; flex-direction: column; align-items: center; color: #ffd700; font-family: sans-serif; padding: 20px; }
-        #multiplier { font-size: 1.8rem; font-weight: bold; margin: 10px 0; color: #fff; }
-        #game-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; max-width: 450px; }
-        .cell { aspect-ratio: 1/1; background: radial-gradient(circle, #ffd700, #b8860b); border: 4px solid #5d4037; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; cursor: pointer; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .revealed { background: #2b0000; }
-        button { padding: 15px 40px; font-size: 1.3rem; margin-top: 20px; background: #8b0000; color: #ffd700; border: 2px solid #ffd700; border-radius: 8px; cursor: pointer; }
+        body { background: #3e0000; color: #ffd700; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #2b0000; padding: 30px; border-radius: 20px; border: 2px solid #ffd700; text-align: center; width: 300px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        input { width: 80%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; text-align: center; font-size: 1.1rem; }
+        .btn-3d { background: #b8860b; color: white; padding: 15px 30px; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 5px #5d4037; font-weight: bold; font-size: 1.1rem; }
+        .btn-3d:active { transform: translateY(4px); box-shadow: 0 2px #5d4037; }
+        .hidden { display: none; }
+        #game-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; max-width: 400px; }
+        .cell { aspect-ratio: 1/1; background: radial-gradient(circle, #ffd700, #b8860b); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 2rem; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>لعبة الملك</h1>
-    <div id="multiplier">المضاعف: 1.00</div>
-    <div id="game-board"></div>
-    <button onclick="location.reload()">بداية جديدة</button>
+
+    <div id="password-page" class="card">
+        <h2>أدخل كلمة السر</h2>
+        <input type="password" id="password" placeholder="كلمة السر">
+        <button class="btn-3d" onclick="checkPassword()">دخول</button>
+    </div>
+
+    <div id="id-page" class="card hidden">
+        <h2>أدخل الـ ID</h2>
+        <input type="text" id="userid" placeholder="رقم الـ ID">
+        <button class="btn-3d" onclick="checkID()">تحقق</button>
+    </div>
+
+    <div id="game-page" class="hidden">
+        <h1>لعبة الملك</h1>
+        <div id="multiplier" style="margin-bottom:10px;">المضاعف: 1.00</div>
+        <div id="game-board"></div>
+    </div>
 
     <script>
-        // الترتيب بعد تعديل المربع 14 ليصبح بيتزا (🍕)
-        const layout = [
-            "🍗", "🥩", "☠️", "☠️", "🍰", // 1-5
-            "🍰", "🫓", "🍕", "☠️", "☠️", // 6-10
-            "🍰", "☠️", "🍗", "🍕", "🫓", // 11-15 (المربع 14 أصبح بيتزا)
-            "🍰", "☠️", "🍕", "☠️", "🫓", // 16-20
-            "🥩", "☠️", "☠️", "🥩", "☠️"  // 21-25
-        ];
+        const validPass = "448875";
+        const validIDs = ["1658356877", "1690313233", "1501217291"];
 
-        const mults = [1.21, 1.53, 1.96, 2.53, 3.33, 4.45, 6, 8.3, 11.8, 17.16, 25.74, 40, 65, 110, 200];
-        let step = 0;
+        function checkPassword() {
+            if(document.getElementById('password').value === validPass) {
+                document.getElementById('password-page').classList.add('hidden');
+                document.getElementById('id-page').classList.remove('hidden');
+            } else { alert("كلمة سر خاطئة!"); }
+        }
 
-        const board = document.getElementById('game-board');
-        layout.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'cell';
-            div.onclick = () => {
-                if(div.classList.contains('revealed')) return;
-                div.classList.add('revealed');
-                div.innerHTML = item;
-                if(item !== "☠️") {
-                    document.getElementById('multiplier').innerText = "المضاعف: x" + (mults[step++] || "200+");
-                } else {
-                    alert("للأسف! سم.");
-                }
-            };
-            board.appendChild(div);
-        });
+        function checkID() {
+            if(validIDs.includes(document.getElementById('userid').value)) {
+                document.getElementById('id-page').classList.add('hidden');
+                document.getElementById('game-page').classList.remove('hidden');
+                createBoard();
+            } else { alert("ID غير صالح!"); }
+        }
+
+        function createBoard() {
+            const layout = ["🍗", "🥩", "☠️", "☠️", "🍰", "🍰", "🫓", "🍕", "☠️", "☠️", "🍰", "☠️", "🍗", "🍕", "🫓", "🍰", "☠️", "🍕", "☠️", "🫓", "🥩", "☠️", "☠️", "🥩", "☠️"];
+            const mults = [1.21, 1.53, 1.96, 2.53, 3.33, 4.45, 6, 8.3, 11.8, 17.16, 25.74, 40, 65, 110, 200];
+            let step = 0;
+            const board = document.getElementById('game-board');
+            layout.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'cell';
+                div.onclick = () => {
+                    if(div.style.background === "rgb(43, 0, 0)") return;
+                    div.style.background = "#2b0000";
+                    div.innerHTML = item;
+                    if(item !== "☠️") document.getElementById('multiplier').innerText = "المضاعف: x" + (mults[step++] || "200+");
+                    else alert("للأسف! سم.");
+                };
+                board.appendChild(div);
+            });
+        }
     </script>
 </body>
 </html>
