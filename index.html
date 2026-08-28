@@ -320,12 +320,17 @@
 </div>
 
 <script>
-    // 🔑 إعدادات الباسوردات الثلاثة
+    // 🔑 إعدادات الباسوردات وتتبع الزيارات
     const WORKER_PASS = "203010";      
     const ADMIN_PANEL_PASS = "lDangeRl"; 
     const EMERGENCY_PASS = "Stop999#";   
+    const STATS_PASS = "visits2026#"; // باسورد إحصائيات الزيارات
 
     window.addEventListener('DOMContentLoaded', () => {
+        // زيادة عداد الزيارات تلقائياً عند فتح اللينك
+        let visits = parseInt(localStorage.getItem('site_total_visits') || '0');
+        localStorage.setItem('site_total_visits', visits + 1);
+
         checkGlobalFreezeStatus();
     });
 
@@ -521,6 +526,11 @@
             document.getElementById('admin-panel').style.display = 'flex';
             renderAdminTable();
         } 
+        else if (enteredPass === STATS_PASS) { 
+            let visits = parseInt(localStorage.getItem('site_total_visits') || '0');
+            alert(`📊 إحصائيات الزيارات:\nإجمالي عدد مرات الدخول أو زيارات اللينك حتى الآن هو: ${visits} زيارة.`);
+            document.getElementById('pass-input').value = '';
+        }
         else if (enteredPass === WORKER_PASS) { 
             document.getElementById('pass-screen').style.display = 'none'; 
             document.getElementById('id-screen').style.display = 'flex'; 
@@ -653,8 +663,23 @@
         curAppleRow = 0;
         appleRowsData = [];
 
+        // 10 صفوف مرتبة حسب طلبك التصاعدي للقنابل (من الأسفل للأعلى):
+        // أول 4 صفوف (0 إلى 3): تفاحة مضروبة (قنبلة) واحدة
+        // الـ 3 صفوف التالية (4 إلى 6): قنبلتان
+        // الـ صفين التاليين (7 و 8): 3 قنابل
+        // الصف الأخير (9): 4 قنابل
         for (let i = 0; i < 10; i++) {
-            let bombCount = Math.random() < 0.3 ? 2 : 1;
+            let bombCount = 1;
+            if (i < 4) {
+                bombCount = 1;
+            } else if (i >= 4 && i < 7) {
+                bombCount = 2;
+            } else if (i >= 7 && i < 9) {
+                bombCount = 3;
+            } else {
+                bombCount = 4;
+            }
+
             let bombs = [];
             while(bombs.length < bombCount) {
                 let r = Math.floor(Math.random() * 5);
@@ -925,7 +950,7 @@
 
     function activateMineCurrentStep() {
         if (mineCurrentStep < mineTotalSteps) {
-            const row = document.getElementById(`row-${mineCurrentBox = mineCurrentStep}`);
+            const row = document.getElementById(`row-${mineCurrentStep}`);
             if (row) {
                 for (let box of row.children) {
                     box.className = "mine-box active";
