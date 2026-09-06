@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MULTI-GAMES VIP 3D 🎮</title>
+    <style>
+        :root {
+            --bg-color: #05070a;
+            --accent-gold: #00ffcc;
+            --win-green: #00ff66;
+            --bomb-red: #ff0055;
+            --blue: #00d4ff;
+            --neon-green: #00ff66;
+            --mine-teal: #00ffcc;
+            --neon-pink: #d900ff;
+            --glass-bg: rgba(16, 22, 34, 0.75);
+            --border-glow: 0 0 25px rgba(0, 255, 204, 0.4), inset 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+        
+        body.theme-neon { --accent-gold: #00ff66; --blue: #00ffcc; --neon-pink: #00ff66; --border-glow: 0 0 25px rgba(0,255,102,0.5), inset 0 0 15px rgba(0,255,204,0.3); }
+        body.theme-gold { --accent-gold: #ffcc00; --blue: #ff9900; --neon-pink: #ff0055; --border-glow: 0 0 25px rgba(255,204,0,0.5), inset 0 0 15px rgba(255,153,0,0.3); }
+        body.theme-purple { --accent-gold: #d900ff; --blue: #9900ff; --mine-teal: #d900ff; --neon-pink: #00ffff; --border-glow: 0 0 25px rgba(217,0,255,0.5), inset 0 0 15px rgba(153,0,255,0.3); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 80%),
+                linear-gradient(rgba(0,0,0,0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.8) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            perspective: 1200px;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 7, 10, 0.88);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+        }
+
+        .login-box {
+            background: var(--glass-bg);
+            padding: 30px 25px;
+            border-radius: 24px;
+            border: 2px solid var(--accent-gold);
+            text-align: center;
+            width: 90%;
+            max-width: 360px;
+            position: relative;
+            box-shadow: var(--border-glow), 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        .login-box h2 {
+            font-size: 1.6rem;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #fff, var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--accent-gold);
+            text-align: center;
+            font-size: 1.05rem;
+            outline: none;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+            transition: 0.3s;
+        }
+        input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 15px var(--accent-gold), inset 0 2px 5px rgba(0,0,0,0.8);
+        }
+        
+        .version-tag {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            letter-spacing: 1.5px;
+        }
+
+        .loading-box { text-align: center; width: 85%; max-width: 320px; }
+        .loading-text { font-size: 1.15rem; margin-bottom: 20px; color: #fff; font-weight: bold; min-height: 30px; text-shadow: 0 0 8px rgba(255,255,255,0.4); }
+        
+        .neon-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.9), 0 0 15px rgba(0,255,102,0.2);
+        }
+        .neon-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--neon-green));
+            box-shadow: 0 0 15px var(--neon-green), 0 0 5px #fff;
+            transition: width 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        .success-check {
+            font-size: 4rem;
+            color: var(--neon-green);
+            margin-bottom: 15px;
+            display: none;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(0 0 20px var(--neon-green));
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            80% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .glow-effect { animation: clientGlow 2s infinite alternate; }
+        @keyframes clientGlow {
+            0% { box-shadow: 0 0 10px var(--accent-gold), inset 0 0 10px rgba(0,255,204,0.2); border-color: var(--accent-gold); }
+            100% { box-shadow: 0 0 30px var(--accent-gold), inset 0 0 20px rgba(0,255,204,0.6); border-color: #fff; }
+        }
+
+        .trial-badge {
+            background: linear-gradient(135deg, rgba(0,255,204,0.1), rgba(0,212,255,0.1));
+            border: 1px dashed var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .games-grid { display: grid; grid-template-columns: 1fr; gap: 12px; width: 100%; margin-top: 15px; max-height: 55vh; overflow-y: auto; padding-right: 5px; }
+        
+        .game-card {
+            background: rgba(20, 28, 42, 0.85);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .game-card:hover {
+            border-color: var(--accent-gold);
+            background: rgba(30, 42, 64, 0.95);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,255,204,0.3);
+        }
+        .game-card div { display: flex; align-items: center; gap: 14px; }
+        .game-card span { font-size: 1.5rem; }
+
+        .header {
+            padding: 14px 18px;
+            background: rgba(16, 22, 34, 0.9);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            border-bottom: 2px solid var(--accent-gold);
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.7);
+        }
+        .back-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .back-btn:hover { background: rgba(255,255,255,0.2); border-color: var(--accent-gold); }
+        
+        .row-wrapper { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 4px; opacity: 0.4; pointer-events: none; transition: 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .row-wrapper.active { opacity: 1; pointer-events: auto; filter: drop-shadow(0 0 10px rgba(0,255,204,0.3)); }
+        .row-cells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .row-reveal-btn { background: linear-gradient(135deg, var(--accent-gold), var(--blue)); color: #000; border: none; padding: 6px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; width: 100%; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: 0.2s; }
+        .row-reveal-btn:hover { transform: scale(1.02); filter: brightness(1.2); }
+
+        #game-board-apple { flex: 1; overflow-y: auto; display: flex; flex-direction: column-reverse; gap: 8px; padding: 12px; align-items: center; }
+        .apple-brick { height: 36px; background: rgba(25, 34, 50, 0.9); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-size: 1.1rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); }
+        .revealed-apple { background: rgba(0, 255, 102, 0.15) !important; border-color: var(--win-green) !important; box-shadow: 0 0 12px rgba(0,255,102,0.4) !important; }
+        .revealed-bomb { background: rgba(255, 0, 85, 0.15) !important; border-color: var(--bomb-red) !important; box-shadow: 0 0 12px rgba(255,0,85,0.4) !important; }
+
+        .gems-container { background: rgba(10, 16, 28, 0.95); border: 2px solid var(--accent-gold); padding: 22px 16px; border-radius: 28px; text-align: center; width: 340px; margin: auto; box-shadow: var(--border-glow), 0 20px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 12px; max-height: 85vh; overflow-y: auto; }
+        .gems-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .cell-gem { height: 48px; background: radial-gradient(circle, var(--blue), #003355); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: 1px solid rgba(0,212,255,0.4); cursor: pointer; transition: 0.25s; box-shadow: inset 0 2px 5px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.5); }
+        .cell-gem:hover { transform: scale(1.08); border-color: #fff; box-shadow: 0 0 15px var(--blue); }
+        .revealed-gem { background: rgba(0,255,102,0.2) !important; border-color: var(--win-green) !important; box-shadow: 0 0 12px var(--win-green) !important; }
+        .revealed-gem-bomb { background: rgba(255,0,85,0.2) !important; border-color: var(--bomb-red) !important; box-shadow: 0 0 12px var(--bomb-red) !important; }
+
+        .royal-container { background: rgba(35, 10, 15, 0.95); padding: 22px 16px; border-radius: 24px; border: 2px solid #ffcc00; width: 100%; max-width: 350px; margin: auto; text-align: center; box-shadow: 0 0 25px rgba(255,204,0,0.3), 0 15px 30px rgba(0,0,0,0.7); display: flex; flex-direction: column; gap: 12px; max-height: 85vh; overflow-y: auto; }
+        .royal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .cell-royal { height: 48px; background: radial-gradient(circle, #ffcc00, #996600); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; border: 1px solid rgba(255,204,0,0.4); cursor: pointer; transition: 0.25s; box-shadow: inset 0 2px 5px rgba(255,255,255,0.3), 0 4px 10px rgba(0,0,0,0.5); }
+        .cell-royal:hover { transform: scale(1.08); border-color: #fff; box-shadow: 0 0 15px #ffcc00; }
+        .revealed-food { background: rgba(0,255,102,0.2) !important; border-color: var(--win-green) !important; box-shadow: 0 0 12px var(--win-green) !important; }
+        .revealed-poison { background: rgba(255,0,85,0.2) !important; border-color: var(--bomb-red) !important; box-shadow: 0 0 12px var(--bomb-red) !important; }
+
+        .mine-container { background: rgba(18, 18, 30, 0.95); padding: 22px; border-radius: 16px; box-shadow: var(--border-glow), 0 15px 35px rgba(0,0,0,0.8); text-align: center; max-width: 400px; width: 100%; border: 2px solid var(--mine-teal); margin: auto; }
+        .mine-mode-buttons { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .mine-mode-btn { background: rgba(30,30,50,0.8); color: var(--mine-teal); border: 2px solid var(--mine-teal); padding: 12px 20px; font-size: 16px; border-radius: 10px; cursor: pointer; font-weight: bold; flex: 1; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .mine-mode-btn:hover { background: var(--mine-teal); color: #05070a; box-shadow: 0 0 20px var(--mine-teal); transform: translateY(-3px); }
+        .mine-header-info { display: flex; justify-content: space-between; background: rgba(30,30,50,0.8); color: var(--mine-teal); padding: 10px 14px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; font-size: 14px; border: 1px solid var(--mine-teal); }
+        .ladder { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .row-level { display: flex; gap: 8px; justify-content: center; }
+        .mine-box { background: rgba(35, 35, 55, 0.8); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; height: 44px; flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #aaa; font-weight: bold; cursor: pointer; transition: 0.25s; }
+        .mine-box.active { border-color: var(--mine-teal); color: #fff; background: rgba(10, 30, 40, 0.9); box-shadow: 0 0 12px rgba(0,255,204,0.5); }
+        .mine-box.revealed-gold { background: rgba(0,255,102,0.2) !important; border-color: var(--win-green) !important; color: var(--win-green) !important; box-shadow: 0 0 10px var(--win-green) !important; }
+        .mine-box.revealed-bomb { background: rgba(255,0,85,0.2) !important; border-color: var(--bomb-red) !important; color: var(--bomb-red) !important; box-shadow: 0 0 10px var(--bomb-red) !important; }
+        .mine-btn { background: var(--mine-teal); color: #05070a; border: none; padding: 12px 20px; font-size: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,255,204,0.4); }
+        .mine-btn:hover { filter: brightness(1.2); box-shadow: 0 0 20px var(--mine-teal); }
+
+        .controls { padding: 12px 18px; background: rgba(16, 22, 34, 0.9); backdrop-filter: blur(10px); border-top: 2px solid rgba(255,255,255,0.1); display: flex; gap: 12px; flex-shrink: 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.7); }
+        .btn-3d { padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: #05070a; flex: 1; box-shadow: 0 6px 20px rgba(0,0,0,0.5); transition: 0.3s; }
+        .btn-3d:hover { transform: scale(1.02); }
+        .btn-blue { background: transparent; color: var(--blue); border: 1px solid var(--blue); box-shadow: inset 0 0 10px rgba(0,212,255,0.2); }
+        .btn-blue:hover { background: var(--blue); color: #05070a; box-shadow: 0 0 20px var(--blue); }
+
+        .id-manage-table { width: 100%; margin-top: 5px; border-collapse: collapse; font-size: 0.8rem; text-align: right; }
+        .id-manage-table th, .id-manage-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ddd; }
+        .id-manage-table th { background: rgba(30,40,60,0.9); color: var(--accent-gold); }
+        .action-icon-btn { background: none; border: none; cursor: pointer; font-size: 0.95rem; padding: 2px 6px; transition: 0.2s; }
+        .action-icon-btn:hover { transform: scale(1.2); }
+
+        #ai-sim-overlay { position: fixed; inset: 0; background: rgba(5,7,10,0.92); backdrop-filter: blur(15px); display: none; justify-content: center; align-items: center; z-index: 3000; flex-direction: column; }
+        .ai-sim-box { background: rgba(18, 24, 36, 0.95); border: 2px solid var(--accent-gold); padding: 25px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 30px rgba(0,255,204,0.4), inset 0 0 15px rgba(0,255,204,0.2); }
+
+        .timer-hud {
+            font-size: 0.85rem;
+            color: var(--win-green);
+            background: rgba(0,255,102,0.1);
+            border: 1px solid var(--win-green);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            box-shadow: 0 0 10px rgba(0,255,102,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body class="theme-gold">
+
+<div id="ai-sim-overlay">
+    <div class="ai-sim-box">
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🌐</div>
+        <div id="ai-sim-text" style="font-size: 1rem; font-weight: bold; color: var(--accent-gold); margin-bottom: 18px; min-height: 40px;">جاري تحليل خوارزمية السيرفر...</div>
+        <div class="neon-bar-container">
+            <div id="ai-sim-bar" class="neon-bar" style="width: 0%;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="pass-screen" class="overlay">
+    <div class="login-box">
+        <h2>SECURE ACCESS 🔐</h2>
+        <div class="trial-badge"><span>⚡</span> أدخل كود التفعيل أو باسورد الإدارة</div>
+        <input type="password" id="pass-input" placeholder="أدخل الكود أو الباسورد">
+        <button class="btn-3d" style="background:var(--accent-gold); margin-top: 12px;" onclick="checkPass()">دخول</button>
+        <div class="version-tag">SYSTEM v8.6.6 (Universal Sync)</div>
+    </div>
+</div>
+
+<div id="admin-panel" class="overlay" style="display:none">
+    <div class="login-box" style="border-color: var(--blue); max-width: 420px;">
+        <h2 style="color: var(--blue); font-size: 1.15rem;">لوحة توليد الأكواد (المالك) 🛠️</h2>
+        
+        <div style="background: rgba(20,28,42,0.9); padding: 14px; border-radius: 12px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn-3d btn-blue" style="padding: 10px; width: 100%; font-size: 0.95rem;" onclick="generateCodeBatch()">⚡ توليد دفعة أكواد جديدة (15 كود)</button>
+            <button class="btn-3d" style="background: var(--win-green); color: #05070a; padding: 9px; width: 100%; font-size: 0.85rem;" onclick="copyAllCodes()">📋 نسخ جميع الأكواد دفعة واحدة</button>
+        </div>
+
+        <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; text-align: right;">
+            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">الأكواد (مع روابط التفعيل المباشر):</span>
+            <div style="max-height: 180px; overflow-y: auto; margin-top: 6px;">
+                <table class="id-manage-table" id="codes-table">
+                    <thead>
+                        <tr>
+                            <th>الكود / الرابط</th>
+                            <th>الحالة</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="codes-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="btn-3d" style="background:#333; color:white; margin-top: 15px; padding: 9px;" onclick="closeAdminPanel()">خروج ❌</button>
+    </div>
+</div>
+
+<div id="roma-panel" class="overlay" style="display:none">
+    <div class="login-box" style="border-color: var(--win-green); max-width: 420px;">
+        <h2 style="color: var(--win-green); font-size: 1.15rem;">إدارة وتفعيل الـ IDs ⚙️</h2>
+        <div style="margin-top: 10px; text-align: right;">
+            <input type="text" id="new-id-input" placeholder="أدخل الـ ID الجديد للعميل" style="font-size: 0.85rem; padding: 10px;">
+            <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
+                <span style="font-size: 0.75rem; color: #aaa;">عدد المحاولات:</span>
+                <select id="new-id-attempts" style="margin: 0; padding: 6px; font-size: 0.85rem;">
+                    <option value="1">1 محاولة</option>
+                    <option value="2">2 محاولات</option>
+                    <option value="3" selected>3 محاولات</option>
+                    <option value="4">4 محاولات</option>
+                    <option value="5">5 محاولات</option>
+                </select>
+            </div>
+            <button class="btn-3d" style="background: var(--win-green); color: #05070a; padding: 9px; font-size: 0.85rem; width: 100%; margin-top: 8px;" onclick="addClientCustomID()">إضافة وتفعيل الـ ID</button>
+        </div>
+
+        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; text-align: right;">
+            <span style="font-size: 0.75rem; color: var(--win-green); font-weight: bold;">الـ IDs المفعلة حالياً:</span>
+            <div style="max-height: 180px; overflow-y: auto; margin-top: 6px;">
+                <table class="id-manage-table" id="roma-ids-table">
+                    <thead>
+                        <tr>
+                            <th>الـ ID</th>
+                            <th>المحاولات المتبقية</th>
+                            <th>تعديل المحاولات</th>
+                            <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roma-ids-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="btn-3d" style="background:#333; color:white; margin-top: 15px; padding: 9px;" onclick="closeRomaPanel()">خروج ❌</button>
+    </div>
+</div>
+
+<div id="id-screen" class="overlay" style="display:none">
+    <div class="login-box glow-effect" id="id-login-box">
+        <h2>ID LOGIN 🆔</h2>
+        <div class="trial-badge"><span>⚡</span> أدخل الـ ID الخاص بك للمتابعة</div>
+        <input type="text" id="id-input" placeholder="أدخل الـ ID">
+        <button class="btn-3d" style="background:var(--accent-gold); margin-top: 12px;" onclick="checkID()">تنشيط الاتصال الآمن</button>
+        <div class="version-tag">CLIENT AUTH</div>
+    </div>
+</div>
+
+<div id="loading-screen" class="overlay" style="display:none">
+    <div class="loading-box">
+        <div id="success-icon" class="success-check">✔</div>
+        <div id="loading-msg" class="loading-text">جاري الاتصال بالسيرفر Xparibet.. تم الاتصال بنجاح</div>
+        <div class="neon-bar-container">
+            <div id="neon-progress" class="neon-bar"></div>
+        </div>
+    </div>
+    <div class="version-tag" style="bottom: 30px;">NEON MATRIX ENCRYPTION 256-BIT</div>
+</div>
+
+<div id="game-loading-screen" class="overlay" style="display:none">
+    <div class="loading-box">
+        <div class="success-check" style="display:block; font-size: 2.8rem;">🎮</div>
+        <div id="game-loading-msg" class="loading-text">جاري حقن المحرك بالبيئة الواقعية...</div>
+        <div class="neon-bar-container">
+            <div id="game-neon-progress" class="neon-bar"></div>
+        </div>
+    </div>
+    <div class="version-tag" style="bottom: 30px;">3D ENGINE SYNC</div>
+</div>
+
+<div id="lobby-screen" class="overlay" style="display:none">
+    <div class="login-box" style="max-width: 400px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2>اختر اللعبة 🎮</h2>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <div id="session-timer-hud" class="timer-hud">⏱️ 02:00</div>
+                <div id="attempts-hud" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 6px; margin-bottom: 12px; background: rgba(20,28,42,0.8); padding: 8px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 0.75rem; align-self: center; color: #aaa;">الثيم:</span>
+            <button onclick="setTheme('gold')" style="background:#ffcc00; border:none; padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:bold; color:#000;">ذهبي</button>
+            <button onclick="setTheme('neon')" style="background:#00ff66; border:none; padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:bold; color:#000;">نيون أخضر</button>
+            <button onclick="setTheme('purple')" style="background:#d900ff; border:none; color:white; padding:5px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; font-weight:bold;">بنفسجي</button>
+        </div>
+
+        <div class="games-grid">
+            <div class="game-card" onclick="openGame('crash')"><div><span>✈️</span> Crash</div></div>
+            <div class="game-card" onclick="openGame('apple')"><div><span>🍎</span> Apple 3D</div></div>
+            <div class="game-card" onclick="openGame('gems')"><div><span>💎</span> Gems & Mines</div></div>
+            <div class="game-card" onclick="openGame('royal')"><div><span>🍗</span> Royal Feast</div></div>
+            <div class="game-card" onclick="openGame('goldmine')"><div><span>⛏️</span> Wild West Gold</div></div>
+        </div>
+        <div class="version-tag">MULTI-GAME LOBBY v8.6</div>
+    </div>
+</div>
+
+<div id="main-container" style="display:none; flex-direction:column; height:100%">
+    
+    <div id="game-apple" class="game-section" style="display:none; flex-direction:column; height:100%;">
+        <div class="header">
+            <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
+            <span>Apple 🍎 [3D Mode]</span>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-apple" class="timer-hud">⏱️ 02:00</div>
+                <div id="game-attempts-hud-apple" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
+        </div>
+        <div id="game-board-apple"></div>
+        <div class="controls">
+            <button class="btn-3d" style="background:var(--accent-gold); color:#05070a" onclick="resetGameSession('apple')">إعادة تهيئة (Reset) 🔄</button>
+        </div>
+    </div>
+
+    <div id="game-gems" class="game-section" style="display:none; flex-direction:column; height:100%;">
+        <div class="header">
+            <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
+            <span>Gems & Mines 💎</span>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-gems" class="timer-hud">⏱️ 02:00</div>
+                <div id="game-attempts-hud-gems" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
+        </div>
+        <div style="flex:1; display:flex; justify-content:center; align-items:center; padding: 10px;">
+            <div class="gems-container">
+                <div style="font-size: 16px; color: var(--accent-gold); font-weight:bold;">RADAR GEMS 3D</div>
+                <div id="game-board-gems" class="royal-grid"></div>
+                <div style="font-size: 13px; color: #aaa;">اضغط على أي خانة لكشف محتواها بنظام النيون المتشابك!</div>
+                <button class="btn-3d btn-blue" style="padding: 10px;" onclick="resetGameSession('gems')">إعادة تهيئة الشبكة (Reset) 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-royal" class="game-section" style="display:none; flex-direction:column; height:100%;">
+        <div class="header">
+            <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
+            <span>Royal Feast 🍗</span>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-royal" class="timer-hud">⏱️ 02:00</div>
+                <div id="game-attempts-hud-royal" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
+        </div>
+        <div style="flex:1; display:flex; justify-content:center; align-items:center; background:rgba(27,0,0,0.6); padding: 10px;">
+            <div class="royal-container">
+                <div style="font-size: 16px; color: var(--accent-gold); font-weight: bold;">ROYAL FEAST RADAR 3D</div>
+                <div id="game-board-royal" class="royal-grid"></div>
+                <div style="font-size: 13px; color: #aaa;">اضغط على أي طبق لكشف محتواه بواقعية مذهلة!</div>
+                <button class="btn-3d" style="background:var(--accent-gold); color:#05070a; padding: 10px;" onclick="resetGameSession('royal')">إعادة تهيئة الشبكة (Reset) 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-goldmine" class="game-section" style="display:none; flex-direction:column; height:100%;">
+        <div class="header">
+            <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
+            <span>Wild West Gold ⛏️</span>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-gold" class="timer-hud">⏱️ 02:00</div>
+                <div id="game-attempts-hud-gold" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
+        </div>
+        <div style="flex:1; display:flex; justify-content:center; align-items:center; background:rgba(18,12,8,0.6); padding: 10px;">
+            <div class="mine-container">
+                <div id="mineMainMenu">
+                    <h1 style="color: var(--mine-teal); margin-bottom: 12px; font-size: 18px;">🛡️ Wild West Gold 🔓</h1>
+                    <p style="color: #aaa; margin-bottom: 12px; font-size: 13px;">اختر نظام اللعب لتفعيل السكريبت ثلاثي الأبعاد:</p>
+                    <div class="mine-mode-buttons">
+                        <button class="mine-mode-btn" onclick="initMineGameSession(2)">وضع 2x</button>
+                        <button class="mine-mode-btn" onclick="initMineGameSession(3)">وضع 3x</button>
+                    </div>
+                </div>
+
+                <div id="mineGameArea" style="display:none;">
+                    <div class="mine-header-info">
+                        <div>الحالة: <span style="color: var(--mine-teal);">متصل بالمتعقب 🟢</span></div>
+                        <div>الخطوة: <span id="currentStepText">1</span> / 6</div>
+                    </div>
+
+                    <div class="ladder" id="ladderContainer"></div>
+
+                    <div id="mineMessage" style="font-size: 14px; font-weight: bold; margin: 10px 0; min-height: 25px; color: var(--accent-gold);">ابدأ من الأسفل واضغط على الخطوة الأولى للكشف!</div>
+
+                    <button id="nextSignalBtn" class="mine-btn" onclick="resetMineVariables()" style="margin-bottom: 8px; display:none;">إرسال إشارة جديدة 🔄</button>
+                    <button class="mine-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);" onclick="resetToMineMenu()">تغيير الوضع / القائمة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        let savedTheme = localStorage.getItem('user_theme_style') || 'theme-gold';
+        document.body.className = savedTheme;
+
+        initializeGlobalStorage();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let directCode = urlParams.get('code');
+        if (directCode) {
+            let db = getStoredCodes();
+            if (!db[directCode]) {
+                db[directCode] = { status: "جاهز", expiresAt: null };
+                saveStoredCodes(db);
+            }
+            document.getElementById('pass-input').value = directCode;
+        }
+
+        checkActiveSessionTimer();
+    });
+
+    function initializeGlobalStorage() {
+        if (!localStorage.getItem('dynamic_codes_db')) {
+            let defaultDb = { "VIP3D-START1": { status: "جاهز", expiresAt: null } };
+            localStorage.setItem('dynamic_codes_db', JSON.stringify(defaultDb));
+        }
+        if (!localStorage.getItem('client_ids_db')) {
+            let defaultIDs = { "123456": { status: "مفعل نشط", attempts: 3 } };
+            localStorage.setItem('client_ids_db', JSON.stringify(defaultIDs));
+        }
+    }
+
+    function setTheme(themeName) {
+        let cls = 'theme-gold';
+        if(themeName === 'neon') cls = 'theme-neon';
+        if(themeName === 'purple') cls = 'theme-purple';
+        document.body.className = cls;
+        localStorage.setItem('user_theme_style', cls);
+    }
+
+    let sessionTimerInterval = null;
+    let activeCodeKey = null;
+    let activeClientKey = null;
+    let currentActiveGame = null;
+
+    function startSessionTimer(expiresAt, code) {
+        if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+        activeCodeKey = code;
+        
+        sessionTimerInterval = setInterval(() => {
+            let leftSec = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+            let min = Math.floor(leftSec / 60);
+            let sec = leftSec % 60;
+            let timeStr = `⏱️ ${min}:${sec < 10 ? '0' : ''}${sec}`;
+
+            ['session-timer-hud', 'game-timer-hud-apple', 'game-timer-hud-gems', 'game-timer-hud-royal', 'game-timer-hud-gold'].forEach(id => {
+                let el = document.getElementById(id);
+                if (el) el.innerText = timeStr;
+            });
+
+            if (leftSec <= 0) {
+                clearInterval(sessionTimerInterval);
+                let db = getStoredCodes();
+                if(db[activeCodeKey]) {
+                    db[activeCodeKey].status = "منتهي";
+                    saveStoredCodes(db);
+                }
+                alert("انتهت صلاحية جلسة الـ دقيقتين الخاصة بك!");
+                location.href = window.location.pathname; 
+            }
+        }, 1000);
+    }
+
+    function checkActiveSessionTimer() {
+        let db = getStoredCodes();
+        for (let code in db) {
+            if (db[code].status === "active" && db[code].expiresAt > Date.now()) {
+                startSessionTimer(db[code].expiresAt, code);
+                break;
+            }
+        }
+    }
+
+    function updateAttemptsHUD() {
+        let idsDb = getStoredIDs();
+        if (activeClientKey && idsDb[activeClientKey]) {
+            let attempts = idsDb[activeClientKey].attempts;
+            ['attempts-hud', 'game-attempts-hud-apple', 'game-attempts-hud-gems', 'game-attempts-hud-royal', 'game-attempts-hud-gold'].forEach(id => {
+                let el = document.getElementById(id);
+                if (el) el.innerText = `🎮 ${attempts}`;
+            });
+        }
+    }
+
+    function consumeAttemptForGame(gameName) {
+        if (!activeClientKey) return true;
+        if (currentActiveGame === gameName) return true;
+
+        let idsDb = getStoredIDs();
+        if (idsDb[activeClientKey]) {
+            if (idsDb[activeClientKey].attempts > 0) {
+                idsDb[activeClientKey].attempts -= 1;
+                saveStoredIDs(idsDb);
+                updateAttemptsHUD();
+                currentActiveGame = gameName;
+                return true;
+            } else {
+                alert("لقد استنفدت عدد المحاولات المتاحة لهذا الـ ID!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function runAISimulation(gameName, callback) {
+        if (!consumeAttemptForGame(gameName)) return;
+        
+        const overlay = document.getElementById('ai-sim-overlay');
+        const text = document.getElementById('ai-sim-text');
+        const bar = document.getElementById('ai-sim-bar');
+        
+        overlay.style.display = 'flex';
+        bar.style.width = '0%';
+
+        let steps = [
+            "جاري تحليل خوارزمية السيرفر ثلاثي الأبعاد...",
+            "تحليل أنماط التشابك والنيون العشوائي...",
+            "مطابقة النطاق الآمن بنسبة 99.9%...",
+            "تم الاستخراج وتفعيل الواقعية بنجاح!"
+        ];
+
+        let p = 0;
+        let interval = setInterval(() => {
+            p += 25;
+            bar.style.width = p + '%';
+            let stepIdx = Math.min(Math.floor(p / 30), steps.length - 1);
+            text.innerText = steps[stepIdx];
+
+            if (p >= 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    if (callback) callback();
+                }, 250);
+            }
+        }, 180);
+    }
+
+    function getStoredCodes() {
+        return JSON.parse(localStorage.getItem('dynamic_codes_db') || '{}');
+    }
+
+    function saveStoredCodes(db) {
+        localStorage.setItem('dynamic_codes_db', JSON.stringify(db));
+    }
+
+    function generateCodeBatch() {
+        let db = getStoredCodes();
+        let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        
+        for (let i = 0; i < 15; i++) {
+            let randomCode = "";
+            let uniqueSeed = Math.floor(Math.random() * 1000000) + Date.now();
+            let tempChars = chars + uniqueSeed.toString();
+            
+            for (let c = 0; c < 6; c++) {
+                let randomIndex = Math.floor(Math.random() * tempChars.length);
+                randomCode += tempChars.charAt(randomIndex);
+            }
+            let formattedCode = "VIP3D-" + randomCode.substring(0, 6).toUpperCase() + Math.floor(Math.random() * 90 + 10);
+            
+            if (!db[formattedCode]) {
+                db[formattedCode] = { status: "جاهز", expiresAt: null };
+            }
+        }
+        saveStoredCodes(db);
+        renderCodesTable();
+        alert("تم توليد دفعة جديدة فريدة كلياً بدون تكرار! ✅");
+    }
+
+    function copyDirectLink(code) {
+        let currentUrl = window.location.href.split('?')[0];
+        let directLink = `${currentUrl}?code=${code}`;
+        
+        navigator.clipboard.writeText(directLink).then(() => {
+            alert(`تم نسخ رابط التفعيل المباشر للعميل بنجاح! 📋\n${directLink}`);
+        }).catch(err => {
+            let textarea = document.createElement("textarea");
+            textarea.value = directLink;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            alert(`تم نسخ الرابط بنجاح! ✅`);
+        });
+    }
+
+    function copyAllCodes() {
+        let db = getStoredCodes();
+        let codesList = Object.keys(db);
+
+        if (codesList.length === 0) {
+            alert("لا توجد أكواد نشطة لنسخها!");
+            return;
+        }
+
+        let currentUrl = window.location.href.split('?')[0];
+        let textToCopy = "روابط وأكواد التفعيل النشطة ثلاثية الأبعاد (VIP 3D):\n";
+        codesList.forEach(code => {
+            textToCopy += `الكود: ${code} | الرابط: ${currentUrl}?code=${code}\n`;
+        });
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("تم نسخ جميع الأكواد مع روابطها المباشرة إلى الحافظة! 📋");
+        }).catch(err => {
+            let textarea = document.createElement("textarea");
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            alert("تم النسخ بنجاح! ✅");
+        });
+    }
+
+    function renderCodesTable() {
+        let tbody = document.getElementById('codes-tbody');
+        tbody.innerHTML = '';
+        let db = getStoredCodes();
+        let codesList = Object.keys(db);
+
+        if (codesList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#777;">لا توجد أكواد مسجلة.</td></tr>`;
+            return;
+        }
+
+        codesList.forEach(code => {
+            let item = db[code];
+            let statusText = "جاهز";
+            if (item.status === "active") {
+                let leftSec = Math.max(0, Math.floor((item.expiresAt - Date.now()) / 1000));
+                let min = Math.floor(leftSec / 60);
+                let sec = leftSec % 60;
+                statusText = `نشط (${min}:${sec < 10 ? '0' : ''}${sec})`;
+            } else if (item.status === "منتهي") {
+                statusText = "منتهي";
+            }
+
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-family:monospace; font-weight:bold; color:var(--accent-gold);">${code}</td>
+                <td><span style="font-size:0.75rem;">${statusText}</span></td>
+                <td style="display: flex; gap: 4px; align-items: center; justify-content: flex-end;">
+                    <button class="action-icon-btn" title="نسخ رابط التفعيل المباشر للعميل" onclick="copyDirectLink('${code}')">🔗</button>
+                    <button class="action-icon-btn" title="حذف" onclick="deleteSingleCode('${code}')">❌</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deleteSingleCode(code) {
+        let db = getStoredCodes();
+        delete db[code];
+        saveStoredCodes(db);
+        renderCodesTable();
+    }
+
+    function getStoredIDs() {
+        return JSON.parse(localStorage.getItem('client_ids_db') || '{}');
+    }
+
+    function saveStoredIDs(db) {
+        localStorage.setItem('client_ids_db', JSON.stringify(db));
+    }
+
+    function addClientCustomID() {
+        let idVal = document.getElementById('new-id-input').value.trim();
+        let attVal = parseInt(document.getElementById('new-id-attempts').value);
+        if (idVal.length >= 1) {
+            let idsDb = getStoredIDs();
+            idsDb[idVal] = { 
+                status: "مفعل نشط", 
+                attempts: attVal 
+            };
+            saveStoredIDs(idsDb);
+            document.getElementById('new-id-input').value = '';
+            renderRomaIDsTable();
+            alert(`تم حفظ وتفعيل الـ ID (${idVal}) بنجاح في النظام ويمكن للعميل الدخول به فورا! ✅`);
+        } else {
+            alert("يرجى كتابة ID صحيح!");
+        }
+    }
+
+    function updateIDAttempts(idKey, changeVal) {
+        let idsDb = getStoredIDs();
+        if (idsDb[idKey]) {
+            idsDb[idKey].attempts = Math.max(0, (idsDb[idKey].attempts || 0) + changeVal);
+            saveStoredIDs(idsDb);
+            renderRomaIDsTable();
+            if (activeClientKey === idKey) updateAttemptsHUD();
+        }
+    }
+
+    function renderRomaIDsTable() {
+        let tbody = document.getElementById('roma-ids-tbody');
+        tbody.innerHTML = '';
+        let idsDb = getStoredIDs();
+        let keys = Object.keys(idsDb);
+
+        if (keys.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#777;">لا توجد IDs مفعلة.</td></tr>`;
+            return;
+        }
+
+        keys.forEach(idKey => {
+            let attemptsCount = idsDb[idKey].attempts !== undefined ? idsDb[idKey].attempts : 3;
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-family:monospace; font-weight:bold; color:var(--win-green);">${idKey}</td>
+                <td><span style="font-size:0.75rem; color:var(--accent-gold);">${attemptsCount}</span></td>
+                <td style="display: flex; gap: 4px; align-items: center;">
+                    <button class="action-icon-btn" style="color:var(--win-green); font-weight:bold;" onclick="updateIDAttempts('${idKey}', 1)" title="زيادة محاولة">+1</button>
+                    <button class="action-icon-btn" style="color:var(--bomb-red); font-weight:bold;" onclick="updateIDAttempts('${idKey}', -1)" title="نقصان محاولة">-1</button>
+                </td>
+                <td><button class="action-icon-btn" title="حذف" onclick="deleteSingleID('${idKey}')">❌</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deleteSingleID(idKey) {
+        let idsDb = getStoredIDs();
+        delete idsDb[idKey];
+        saveStoredIDs(idsDb);
+        renderRomaIDsTable();
+    }
+
+    function checkPass() {
+        let enteredPass = document.getElementById('pass-input').value.trim();
+
+        if (enteredPass === "HendFtw00") {
+            document.getElementById('pass-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'flex';
+            renderCodesTable();
+            document.getElementById('pass-input').value = '';
+            return;
+        } 
+
+        if (enteredPass === "Romaftw00") {
+            document.getElementById('pass-screen').style.display = 'none';
+            document.getElementById('roma-panel').style.display = 'flex';
+            renderRomaIDsTable();
+            document.getElementById('pass-input').value = '';
+            return;
+        }
+
+        let db = getStoredCodes();
+        if (db[enteredPass]) {
+            let item = db[enteredPass];
+            let now = Date.now();
+            
+            if (item.status === "جاهز" || !item.expiresAt) {
+                item.status = "active";
+                item.expiresAt = now + (2 * 60 * 1000);
+                saveStoredCodes(db);
+            }
+
+            if (now <= item.expiresAt) {
+                startSessionTimer(item.expiresAt, enteredPass);
+                document.getElementById('pass-screen').style.display = 'none';
+                document.getElementById('id-screen').style.display = 'flex';
+                document.getElementById('pass-input').value = '';
+                return;
+            } else {
+                item.status = "منتهي";
+                saveStoredCodes(db);
+                alert("عذراً، انتهت صلاحية هذا الكود (مرت دقيقتان من لحظة استخدامه)!");
+                document.getElementById('pass-input').value = '';
+                return;
+            }
+        }
+
+        alert("الباسورد أو كود التفعيل غير صحيح!");
+        document.getElementById('pass-input').value = '';
+    }
+    
+    function closeAdminPanel() {
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('pass-screen').style.display = 'flex';
+    }
+
+    function closeRomaPanel() {
+        document.getElementById('roma-panel').style.display = 'none';
+        document.getElementById('pass-screen').style.display = 'flex';
+    }
+
+    function checkID() { 
+        let idVal = document.getElementById('id-input').value.trim();
+        let idsDb = getStoredIDs();
+        
+        let foundKey = Object.keys(idsDb).find(k => k.trim() === idVal);
+
+        if (idVal.length >= 1 && foundKey) { 
+            activeClientKey = foundKey;
+            if (idsDb[foundKey].attempts === undefined) {
+                idsDb[foundKey].attempts = 3;
+                saveStoredIDs(idsDb);
+            }
+            updateAttemptsHUD();
+            document.getElementById('id-screen').style.display = 'none'; 
+            startServerConnection(); 
+        } else { 
+            alert("عذراً، هذا الـ ID غير مسجل أو غير مفعل من قبل الإدارة! يرجى التواصل مع الدعم الفني لتفعيله."); 
+        } 
+    }
+
+    function startServerConnection() {
+        const loadScreen = document.getElementById('loading-screen');
+        const progressBar = document.getElementById('neon-progress');
+        const loadMsg = document.getElementById('loading-msg');
+        const successIcon = document.getElementById('success-icon');
+        
+        loadScreen.style.display = 'flex';
+        progressBar.style.width = '0%';
+        successIcon.style.display = 'none';
+        loadMsg.innerText = "جاري الاتصال بالسيرفر Xparibet..";
+
+        setTimeout(() => {
+            progressBar.style.width = '60%';
+            loadMsg.innerText = "جاري الاتصال بالسيرفر Xparibet..";
+        }, 1200);
+
+        setTimeout(() => {
+            progressBar.style.width = '100%';
+            loadMsg.innerText = "جاري الاتصال بالسيرفر Xparibet.. تم الاتصال بنجاح";
+            successIcon.style.display = 'block';
+        }, 2400);
+
+        setTimeout(() => {
+            loadScreen.style.display = 'none';
+            document.getElementById('lobby-screen').style.display = 'flex';
+        }, 3200);
+    }
+
+    function openGame(gameName) {
+        if(gameName === 'crash') {
+            alert("هذه اللعبة غير متوفرة حالياً ✈️");
+            return;
+        }
+
+        document.getElementById('lobby-screen').style.display = 'none';
+        const gameLoadScreen = document.getElementById('game-loading-screen');
+        const gameProgressBar = document.getElementById('game-neon-progress');
+        const gameLoadMsg = document.getElementById('game-loading-msg');
+        
+        gameLoadScreen.style.display = 'flex';
+        gameProgressBar.style.width = '0%';
+        
+        let gameTitles = {
+            'apple': 'لعبة Apple 3D 🍎',
+            'gems': 'لعبة Gems & Mines 💎',
+            'royal': 'لعبة Royal Feast 🍗',
+            'goldmine': 'لعبة Wild West Gold ⛏️'
+        };
+
+        gameLoadMsg.innerText = `جاري تجهيز بيئة ${gameTitles[gameName]}...`;
+
+        setTimeout(() => {
+            gameProgressBar.style.width = '55%';
+            gameLoadMsg.innerText = "جاري تطبيق خوارزميات الـ 3D والنيون...";
+        }, 700);
+
+        setTimeout(() => {
+            gameProgressBar.style.width = '100%';
+            gameLoadMsg.innerText = "تم الاتصال بنجاح!";
+        }, 1400);
+
+        setTimeout(() => {
+            gameLoadScreen.style.display = 'none';
+            document.getElementById('main-container').style.display = 'flex';
+            document.querySelectorAll('.game-section').forEach(sec => sec.style.display = 'none');
+            
+            if(gameName === 'apple') {
+                document.getElementById('game-apple').style.display = 'flex';
+                startGameAppleSetup();
+            } else if(gameName === 'gems') {
+                document.getElementById('game-gems').style.display = 'flex';
+                renderGemsGridSetup();
+            } else if(gameName === 'royal') {
+                document.getElementById('game-royal').style.display = 'flex';
+                initRoyalGameSetup();
+            } else if(gameName === 'goldmine') {
+                document.getElementById('game-goldmine').style.display = 'flex';
+                document.getElementById('mineMainMenu').style.display = 'block';
+                document.getElementById('mineGameArea').style.display = 'none';
+            }
+        }, 1900);
+    }
+
+    function returnToLobby() {
+        currentActiveGame = null;
+        document.getElementById('main-container').style.display = 'none';
+        document.getElementById('lobby-screen').style.display = 'flex';
+        updateAttemptsHUD();
+    }
+
+    function resetGameSession(gameName) {
+        currentActiveGame = null;
+        if(gameName === 'apple') startGameAppleSetup();
+        else if(gameName === 'gems') renderGemsGridSetup();
+        else if(gameName === 'royal') initRoyalGameSetup();
+    }
+
+    let curAppleRow = 0;
+    let appleRowsData = [];
+
+    function startGameAppleSetup() {
+        const board = document.getElementById('game-board-apple');
+        board.innerHTML = '';
+        curAppleRow = 0;
+        appleRowsData = [];
+
+        for (let i = 0; i < 10; i++) {
+            let bombCount = 1;
+            if (i >= 4 && i < 7) bombCount = 2;
+            else if (i >= 7 && i < 9) bombCount = 3;
+            else if (i >= 9) bombCount = 4;
+
+            let bombs = [];
+            while(bombs.length < bombCount) {
+                let r = Math.floor(Math.random() * 5);
+                if(!bombs.includes(r)) bombs.push(r);
+            }
+            appleRowsData.push(bombs);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'row-wrapper' + (i === 0 ? ' active' : '');
+            wrapper.id = 'apple-row-' + i;
+
+            const rDiv = document.createElement('div');
+            rDiv.className = 'row-cells';
+            for (let j = 0; j < 5; j++) {
+                const b = document.createElement('div');
+                b.className = 'apple-brick';
+                b.innerText = '🔒';
+                rDiv.appendChild(b);
+            }
+            wrapper.appendChild(rDiv);
+
+            const revealBtn = document.createElement('button');
+            revealBtn.className = 'row-reveal-btn';
+            revealBtn.innerText = `🔍 كشف الصف (${i + 1})`;
+            revealBtn.onclick = () => {
+                runAISimulation('apple', () => revealAppleRow(i));
+            };
+            wrapper.appendChild(revealBtn);
+            board.appendChild(wrapper);
+        }
+    }
+
+    function revealAppleRow(rowIdx) {
+        if (rowIdx !== curAppleRow) return;
+
+        const wrapper = document.getElementById('apple-row-' + rowIdx);
+        const bricks = wrapper.querySelectorAll('.apple-brick');
+        wrapper.querySelector('.row-reveal-btn').style.display = 'none';
+
+        let bombs = appleRowsData[rowIdx];
+        for (let j = 0; j < 5; j++) {
+            if (bombs.includes(j)) {
+                bricks[j].innerText = '💣';
+                bricks[j].className = 'apple-brick revealed-bomb';
+            } else {
+                bricks[j].innerText = '🍎';
+                bricks[j].className = 'apple-brick revealed-apple';
+            }
+        }
+
+        curAppleRow++;
+        if (curAppleRow < 10) {
+            let nextWrapper = document.getElementById('apple-row-' + curAppleRow);
+            if (nextWrapper) nextWrapper.classList.add('active');
+        } else {
+            alert("تم كشف جميع خطوات الشجرة بنجاح! 🏆");
+        }
+    }
+
+    let gemsBombPositions = [];
+
+    function renderGemsGridSetup() {
+        const board = document.getElementById('game-board-gems');
+        board.innerHTML = "";
+        gemsBombPositions = [];
+
+        let allIndices = [];
+        for (let idx = 0; idx < 25; idx++) allIndices.push(idx);
+        gemsBombPositions = allIndices.sort(() => Math.random() - 0.5).slice(0, 2);
+
+        for (let i = 0; i < 25; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell-gem';
+            cell.innerText = '❓';
+            cell.onclick = () => {
+                runAISimulation('gems', () => revealGemsCell(cell, i));
+            };
+            board.appendChild(cell);
+        }
+    }
+
+    function revealGemsCell(cell, index) {
+        if (cell.classList.contains('revealed-gem') || cell.classList.contains('revealed-gem-bomb')) return;
+
+        if (gemsBombPositions.includes(index)) {
+            cell.innerText = '💣';
+            cell.className = 'cell-gem revealed-gem-bomb';
+        } else {
+            cell.innerText = '💎';
+            cell.className = 'cell-gem revealed-gem';
+        }
+    }
+
+    let royalRowsData = [];
+
+    function initRoyalGameSetup() {
+        const board = document.getElementById('game-board-royal');
+        board.innerHTML = "";
+        royalRowsData = [];
+
+        let rowPoisonCounts = [3, 1, 2, 2, 2];
+        rowPoisonCounts.sort(() => Math.random() - 0.5);
+
+        for (let r = 0; r < 5; r++) {
+            let poisonCount = rowPoisonCounts[r];
+            let rowIndices = [0, 1, 2, 3, 4].map(col => (r * 5) + col);
+            let rowPoisons = rowIndices.sort(() => Math.random() - 0.5).slice(0, poisonCount);
+            royalRowsData.push(...rowPoisons);
+        }
+
+        for (let i = 0; i < 25; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell-royal';
+            cell.innerText = '❓';
+            cell.onclick = () => {
+                runAISimulation('royal', () => revealRoyalCell(cell, i));
+            };
+            board.appendChild(cell);
+        }
+    }
+
+    function revealRoyalCell(cell, index) {
+        if (cell.classList.contains('revealed-food') || cell.classList.contains('revealed-poison')) return;
+
+        const foods = ["🍗", "🥩", "🍰", "🍕"];
+        if (royalRowsData.includes(index)) {
+            cell.innerText = '☠️';
+            cell.className = 'cell-royal revealed-poison';
+        } else {
+            cell.innerText = foods[Math.floor(Math.random() * foods.length)];
+            cell.className = 'cell-royal revealed-food';
+        }
+    }
+
+    let mineMode = 2; 
+    let mineCurrentStep = 0; 
+    const mineTotalSteps = 6; 
+    let mineWinningPaths = []; 
+
+    function initMineGameSession(selectedMode) {
+        mineMode = selectedMode;
+        document.getElementById('mineMainMenu').style.display = 'none';
+        document.getElementById('mineGameArea').style.display = 'block';
+        resetMineVariables();
+    }
+
+    function resetMineVariables() {
+        mineCurrentStep = 0;
+        mineWinningPaths = [];
+        document.getElementById('nextSignalBtn').style.display = 'none';
+        document.getElementById('mineMessage').innerText = "السكريبت جاهز.. ابدأ من الأسفل للصعود أعلى!";
+
+        for (let i = 0; i < mineTotalSteps; i++) {
+            mineWinningPaths.push(Math.floor(Math.random() * mineMode));
+        }
+        buildMineLadder();
+    }
+
+    function buildMineLadder() {
+        const ladder = document.getElementById('ladderContainer');
+        ladder.innerHTML = "";
+
+        for (let i = mineTotalSteps - 1; i >= 0; i--) {
+            const row = document.createElement('div');
+            row.className = 'row-level';
+            row.id = `row-${i}`;
+
+            for (let j = 0; j < mineMode; j++) {
+                const box = document.createElement('div');
+                box.className = `mine-box ${i === mineCurrentStep ? 'active' : ''}`;
+                box.innerText = i === mineCurrentStep ? "🔍 اكشف" : "🔒 مغلق";
+                box.onclick = () => {
+                    runAISimulation('goldmine', () => revealMineStep(i));
+                };
+                row.appendChild(box);
+            }
+            ladder.appendChild(row);
+        }
+        document.getElementById('currentStepText').innerText = mineCurrentStep + 1;
+    }
+
+    function revealMineStep(step) {
+        if (step !== mineCurrentStep) return;
+
+        const correctIndex = mineWinningPaths[step];
+        const row = document.getElementById(`row-${step}`);
+        const boxes = row.children;
+
+        for (let j = 0; j < boxes.length; j++) {
+            boxes[j].onclick = null;
+            if (j === correctIndex) {
+                boxes[j].innerHTML = "🪙 ذهب";
+                boxes[j].className = "mine-box revealed-gold";
+            } else {
+                boxes[j].innerHTML = "🧨 ديناميت";
+                boxes[j].className = "mine-box revealed-bomb";
+            }
+        }
+
+        mineCurrentStep++;
+        if (mineCurrentStep < mineTotalSteps) {
+            document.getElementById('mineMessage').innerText = "ممتاز! اصعد للخطوة التالية للأعلى ⚡";
+            activateMineCurrentStep();
+        } else {
+            document.getElementById('mineMessage').innerText = "وصلت للقمة وتم كشف جميع الخطوات بنجاح! 🏆";
+            document.getElementById('nextSignalBtn').style.display = 'block';
+        }
+        document.getElementById('currentStepText').innerText = Math.min(mineCurrentStep + 1, mineTotalSteps);
+    }
+    
+    function activateMineCurrentStep() {
+        if (mineCurrentStep < mineTotalSteps) {
+            const row = document.getElementById(`row-${mineCurrentStep}`);
+            if (row) {
+                for (let box of row.children) {
+                    box.className = "mine-box active";
+                    box.innerText = "🔍 اكشف";
+                    box.onclick = () => {
+                        runAISimulation('goldmine', () => revealMineStep(mineCurrentStep));
+                    };
+                }
+            }
+        }
+    }
+
+    function resetToMineMenu() {
+        currentActiveGame = null;
+        document.getElementById('mineGameArea').style.display = 'none';
+        document.getElementById('mineMainMenu').style.display = 'block';
+    }
+</script>
+</body>
+</html>
